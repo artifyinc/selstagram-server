@@ -1,0 +1,7 @@
+Django==1.10.6
+django-filter==1.0.1
+django-model-utils==2.6.1
+djangorestframework==3.6.2
+Markdown==2.6.8
+psycopg2==2.7.1
+pytz==2016.10
