@@ -1,5 +1,5 @@
 db.sqlite3
 
- *.py[co]
- __pycache__
+*.py[co]
+__pycache__
 .idea
