@@ -2,6 +2,7 @@ from django.db import models
 
 # Create your models here.
 
+
 class StringHelperModelMixin(object):
     def __str__(self):
         return str(self.id)
@@ -22,10 +23,6 @@ class TimeStampedModel(models.Model):
         abstract = True
 
 
-class Tag(TimeStampedModel):
-    name = models.CharField(max_length=128)
-
-
 class Collectable(models.Model):
     collected_at = models.DateTimeField(auto_now_add=True)
     last_updated_at = models.DateTimeField(auto_now=True)
@@ -34,15 +31,10 @@ class Collectable(models.Model):
         abstract = True
 
 
-class MediaSource(TimeStampedModel):
-    name = models.CharField(max_length=128)
-
-
-class Media(Collectable, TimeStampedModel):
-    source = models.ForeignKey(MediaSource, on_delete=models.PROTECT)
-    # tags = models.ManyToManyField(Tag)
-
-    source_id = models.CharField(max_length=512)
+class InstagramMedia(Collectable, TimeStampedModel):
+    id = models.AutoField(primary_key=True)
+    tag = models.CharField(max_length=128)
+    source_id = models.BigIntegerField()
     source_url = models.URLField(max_length=256)
     # slug
     code = models.CharField(max_length=64)
@@ -59,3 +51,9 @@ class Media(Collectable, TimeStampedModel):
 
     def __str__(self):
         return self.field_list_to_string([self.code, self.caption])
+
+
+# class Tag(TimeStampedModel):
+#     name = models.CharField(max_length=128)
+# class MediaSource(TimeStampedModel):
+#     name = models.CharField(max_length=128)
