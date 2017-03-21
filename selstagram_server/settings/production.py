@@ -14,3 +14,9 @@ DATABASES = {
         'ATOMIC_REQUESTS': True,
     },
 }
+
+# FIXME
+# Remove DEBUG and add ALLOWED_HOST
+DEBUG = True
+
+# ALLOWED_HOSTS = []
