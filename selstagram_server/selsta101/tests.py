@@ -17,32 +17,13 @@ class MediaViewTests(APITestCase):
         pass
 
     def test_media(self):
-        # Given :
+        # Given : Create 10 dummy InstagramMedia
         size = 10
         factories.InstagramMediaFactory.create_batch(size=size)
 
-        # When :
+        # When : Invoking media api
         response = self.client.get('/media/')
 
-        # Then :
+        # Then : 10 media elements must be received
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), size)
-
-    def test_serializer(self):
-        # Given:
-        size = 10
-        factories.InstagramMediaFactory.create_batch(size=size)
-
-        # When :
-        queryset = models.InstagramMedia.objects.all()
-        serializer = serializers.InstagramMediaSerializer(queryset, many=True)
-
-        json_renderer = renderers.JSONRenderer()
-        response = json_renderer.render(serializer.data)
-
-        # Then :
-        print(response)
-
-        self.fail()
-
-
