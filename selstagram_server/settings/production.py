@@ -16,7 +16,7 @@ DATABASES = {
 }
 
 # FIXME
-# Remove DEBUG and add ALLOWED_HOST
+# Remove DEBUG and fix ALLOWED_HOST
 DEBUG = True
 
-# ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
