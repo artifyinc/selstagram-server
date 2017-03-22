@@ -26,5 +26,6 @@ router.register('media', selsta101_views.InstagramMediaViewSet)
 
 urlpatterns = [
     url(r'^', include(router.urls)),
+    url(r'^verify_receipt', selsta101_views.verify_receipt),
     url(r'^admin/', admin.site.urls),
 ]
