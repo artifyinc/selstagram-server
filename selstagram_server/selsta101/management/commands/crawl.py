@@ -63,7 +63,7 @@ class Command(BaseCommand):
                                                      height=media['dimensions']['height'],
                                                      thumbnail_url=media['thumbnail_src'],
                                                      owner_id=media['owner']['id'],
-                                                     caption=media['caption'],
+                                                     caption=media.get('caption', ''),
                                                      comment_count=media['comments']['count'],
                                                      like_count=media['likes']['count'],
                                                      created=now,
