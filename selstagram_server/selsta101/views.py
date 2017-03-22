@@ -36,7 +36,7 @@ def verify_receipt(request):
 def _verify_itunes_receipt(receipt_data):
     expires_date_ms = 0
     code = 200
-    itunes_shared_secret = os.environ('SELSTA101_ITUNES_SHARED_SECRET')
+    itunes_shared_secret = os.environ['SELSTA101_ITUNES_SHARED_SECRET']
 
     try:
         with itunesiap.env.review:
