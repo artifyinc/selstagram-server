@@ -1,6 +1,7 @@
 import json
 import logging
 import os
+import random
 
 import itunesiap
 import requests
@@ -15,9 +16,13 @@ log = logging.getLogger(__name__)
 
 
 class InstagramMediaViewSet(viewsets.ModelViewSet):
-    queryset = InstagramMedia.objects.all()
     serializer_class = InstagramMediaSerializer
     permission_classes = (permissions.IsAuthenticatedOrReadOnly, )
+    queryset = InstagramMedia.objects.all()
+
+    def get_queryset(self):
+        sampled_ids = random.sample(range(InstagramMedia.objects.count()), 20)
+        return InstagramMedia.objects.filter(id__in=sampled_ids)
 
 
 @csrf_exempt
