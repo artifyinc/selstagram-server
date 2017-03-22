@@ -18,7 +18,7 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument('--tag', action='store', default='selfie', help='tag name to crawl')
         parser.add_argument('--time', action='store', help='(2017-03-03:2017-03-03)')
-        parser.add_argument('--credential', action='store', help='my_insta_id:my_password')
+        parser.add_argument('--credential', action='store', help='my_insta_id:my_password', required=True)
         parser.add_argument('--count', action='store', help='number of photos to crawl. '
                                                             'IF NOT, all tagged photo are crawled')
 
@@ -33,7 +33,10 @@ class Command(BaseCommand):
                                                   videos_only=False)
 
         count = options.get('count', None)
-        credential = options.get('credential', '3times3meals:selsta101!')
+        if count:
+            count = int(count)
+
+        credential = options['credential']
         username, password = credential.split(':')
         self.instagram_crawler.login(username, password)
 
@@ -60,7 +63,7 @@ class Command(BaseCommand):
                                                      height=media['dimensions']['height'],
                                                      thumbnail_url=media['thumbnail_src'],
                                                      owner_id=media['owner']['id'],
-                                                     caption=media['caption'],
+                                                     caption=media.get('caption', ''),
                                                      comment_count=media['comments']['count'],
                                                      like_count=media['likes']['count'],
                                                      created=now,
@@ -99,6 +102,9 @@ class InstagramCrawler(InstaLooter):
     def _timeless_medias(self, media_count=None, with_pbar=False):
         count = 0
 
+        if media_count == 0:
+            return
+
         for page in self.pages(media_count=media_count, with_pbar=with_pbar):
             for media in page['entry_data'][self._page_name][0][self._section_name]['media']['nodes']:
                 yield media
@@ -110,16 +116,19 @@ class InstagramCrawler(InstaLooter):
     def _timed_medias(self, media_count=None, with_pbar=False, timeframe=None):
         count = 0
 
+        if media_count == 0:
+            return
+
         start_time, end_time = get_times(timeframe)
         for page in self.pages(media_count=media_count, with_pbar=with_pbar):
             for media in page['entry_data'][self._page_name][0][self._section_name]['media']['nodes']:
                 media_date = datetime.date.fromtimestamp(media['date'])
                 if start_time >= media_date >= end_time:
                     yield media
+                    count += 1
 
                 elif media_date < end_time:
                     return
 
-                count += 1
                 if count >= media_count:
                     return
