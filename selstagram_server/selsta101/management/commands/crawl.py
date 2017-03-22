@@ -33,6 +33,9 @@ class Command(BaseCommand):
                                                   videos_only=False)
 
         count = options.get('count', None)
+        if count:
+            count = int(count)
+
         credential = options['credential']
         username, password = credential.split(':')
         self.instagram_crawler.login(username, password)
@@ -99,6 +102,9 @@ class InstagramCrawler(InstaLooter):
     def _timeless_medias(self, media_count=None, with_pbar=False):
         count = 0
 
+        if media_count == 0:
+            return
+
         for page in self.pages(media_count=media_count, with_pbar=with_pbar):
             for media in page['entry_data'][self._page_name][0][self._section_name]['media']['nodes']:
                 yield media
@@ -110,16 +116,19 @@ class InstagramCrawler(InstaLooter):
     def _timed_medias(self, media_count=None, with_pbar=False, timeframe=None):
         count = 0
 
+        if media_count == 0:
+            return
+
         start_time, end_time = get_times(timeframe)
         for page in self.pages(media_count=media_count, with_pbar=with_pbar):
             for media in page['entry_data'][self._page_name][0][self._section_name]['media']['nodes']:
                 media_date = datetime.date.fromtimestamp(media['date'])
                 if start_time >= media_date >= end_time:
                     yield media
+                    count += 1
 
                 elif media_date < end_time:
                     return
 
-                count += 1
                 if count >= media_count:
                     return
