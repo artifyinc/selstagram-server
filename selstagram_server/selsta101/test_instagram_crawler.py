@@ -6,7 +6,7 @@ from .management.commands.crawl import InstagramCrawler
 
 class InstagramCrawlerTest(TestCase):
     def test_instagram_crawler(self):
-        # Given : login to Instagram as username '3tims3meals'
+        # Given : login to Instagram as username 'your_username'
         username = 'your_username'
         password = 'your_password'
         tag = 'selfie'
