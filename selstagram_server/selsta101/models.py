@@ -34,7 +34,7 @@ class Collectable(models.Model):
 class InstagramMedia(Collectable, TimeStampedModel):
     id = models.AutoField(primary_key=True)
     tag = models.CharField(max_length=128)
-    source_id = models.BigIntegerField()
+    source_id = models.BigIntegerField(db_index=True)
     source_url = models.URLField(max_length=256)
     # slug
     code = models.CharField(max_length=64)
@@ -51,9 +51,3 @@ class InstagramMedia(Collectable, TimeStampedModel):
 
     def __str__(self):
         return self.field_list_to_string([self.code, self.caption])
-
-
-# class Tag(TimeStampedModel):
-#     name = models.CharField(max_length=128)
-# class MediaSource(TimeStampedModel):
-#     name = models.CharField(max_length=128)

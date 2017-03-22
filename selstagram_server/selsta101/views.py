@@ -1,20 +1,16 @@
-from django.http import JsonResponse
-from django.shortcuts import render
-
-# Create your views here.
-from django.views.decorators.csrf import csrf_exempt
-
-from rest_framework import viewsets
-from rest_framework import permissions
-
-from .serializers import InstagramMediaSerializer
-from .models import InstagramMedia
+import json
+import logging
+import os
 
 import itunesiap
-import json
 import requests
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from rest_framework import permissions
+from rest_framework import viewsets
 
-import logging
+from .models import InstagramMedia
+from .serializers import InstagramMediaSerializer
 log = logging.getLogger(__name__)
 
 
@@ -30,7 +26,7 @@ def verify_receipt(request):
     receipt_data = payload["receipt-data"]
     if payload.get("new", None):
         product_identifier = payload["new"]["productIdentifier"]
-        requests.post(url="https://hooks.slack.com/services/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",
+        requests.post(url=os.environ['SELSTA101_SLACK_INCOMING_HOOK_URL'],
                       json={"text": "New Customer: " + product_identifier})
     code, expires_date_ms = _verify_itunes_receipt(receipt_data=receipt_data)
 
@@ -40,9 +36,11 @@ def verify_receipt(request):
 def _verify_itunes_receipt(receipt_data):
     expires_date_ms = 0
     code = 200
+    itunes_shared_secret = os.environ('SELSTA101_ITUNES_SHARED_SECRET')
+
     try:
         with itunesiap.env.review:
-            response = itunesiap.verify(receipt_data, "bd68c919a8824b7f9e2082a50e8a79b3")
+            response = itunesiap.verify(receipt_data, itunes_shared_secret)
             in_apps = response.receipt.in_app
             for i in in_apps:
                 new_expires_date_ms = i["expires_date_ms"]

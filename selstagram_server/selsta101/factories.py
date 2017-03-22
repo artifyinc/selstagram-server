@@ -1,14 +1,16 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 import datetime
+
 import factory
 
+from selstagram_server import utils
 from .models import InstagramMedia
 
 
 class InstagramMediaFactory(factory.DjangoModelFactory):
-    created = datetime.date.fromtimestamp(1490058065)
-    modified = datetime.date.fromtimestamp(1490058065)
+    created = datetime.datetime.fromtimestamp(1490058065, tz=utils.BranchUtil.SEOUL_TIMEZONE)
+    modified = datetime.datetime.fromtimestamp(1490058065, tz=utils.BranchUtil.SEOUL_TIMEZONE)
 
     tag = u'selfie'
     source_id = 1475036421974990331
