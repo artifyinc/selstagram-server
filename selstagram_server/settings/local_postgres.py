@@ -1,8 +1,11 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
+
 import getpass
 
-from .local import *
+from .base import *
+
+DEBUG = True
 
 DATABASES = {
     'default': {
@@ -12,3 +15,5 @@ DATABASES = {
         'ATOMIC_REQUESTS': True,
     }
 }
+
+ALLOWED_HOSTS = ['*']
