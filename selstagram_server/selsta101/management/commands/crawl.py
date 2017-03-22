@@ -18,7 +18,7 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument('--tag', action='store', default='selfie', help='tag name to crawl')
         parser.add_argument('--time', action='store', help='(2017-03-03:2017-03-03)')
-        parser.add_argument('--credential', action='store', help='my_insta_id:my_password')
+        parser.add_argument('--credential', action='store', help='my_insta_id:my_password', required=True)
         parser.add_argument('--count', action='store', help='number of photos to crawl. '
                                                             'IF NOT, all tagged photo are crawled')
 
@@ -33,7 +33,7 @@ class Command(BaseCommand):
                                                   videos_only=False)
 
         count = options.get('count', None)
-        credential = options.get('credential', '3times3meals:selsta101!')
+        credential = options['credential']
         username, password = credential.split(':')
         self.instagram_crawler.login(username, password)
 
