@@ -26,7 +26,7 @@ class TimeStampedModel(models.Model):
         abstract = True
 
 
-class InstagramMedia(TimeStampedModel):
+class InstagramMedia(StringHelperModelMixin, TimeStampedModel):
     id = models.AutoField(primary_key=True)
     tag = models.CharField(max_length=128)
     source_id = models.BigIntegerField(db_index=True)
