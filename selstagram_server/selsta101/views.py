@@ -20,7 +20,7 @@ class InstagramMediaViewSet(viewsets.ModelViewSet):
     serializer_class = InstagramMediaSerializer
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
     pagination_class = InstagramMediaPageNation
-    queryset = InstagramMedia.objects.all()
+    queryset = InstagramMedia.objects.order_by('id').all()
 
 
 @csrf_exempt
