@@ -1,6 +1,5 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-import datetime
 
 import factory
 
@@ -9,12 +8,11 @@ from .models import InstagramMedia
 
 
 class InstagramMediaFactory(factory.DjangoModelFactory):
-    created = datetime.datetime.fromtimestamp(1490058065, tz=utils.BranchUtil.SEOUL_TIMEZONE)
-    modified = datetime.datetime.fromtimestamp(1490058065, tz=utils.BranchUtil.SEOUL_TIMEZONE)
-
     tag = u'selfie'
     source_id = 1475036421974990331
     source_url = 'https://scontent-hkg3-1.cdninstagram.com/t51.2885-15/e35/17332382_1671128616520693_6601783536213032960_n.jpg'
+    source_date = factory.LazyFunction(lambda: utils.BranchUtil.date_to_datetime(
+        utils.BranchUtil.today()))
 
     code = 'BR4Yc-KlR37'
     width = 1349

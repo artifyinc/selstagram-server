@@ -1,7 +1,6 @@
 import json
 import logging
 import os
-import random
 
 import itunesiap
 import requests
@@ -10,19 +9,18 @@ from django.views.decorators.csrf import csrf_exempt
 from rest_framework import permissions
 from rest_framework import viewsets
 
+from selsta101.pagenation import InstagramMediaPageNation
 from .models import InstagramMedia
 from .serializers import InstagramMediaSerializer
+
 log = logging.getLogger(__name__)
 
 
 class InstagramMediaViewSet(viewsets.ModelViewSet):
     serializer_class = InstagramMediaSerializer
-    permission_classes = (permissions.IsAuthenticatedOrReadOnly, )
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+    pagination_class = InstagramMediaPageNation
     queryset = InstagramMedia.objects.all()
-
-    def get_queryset(self):
-        sampled_ids = random.sample(range(InstagramMedia.objects.count()), 20)
-        return InstagramMedia.objects.filter(id__in=sampled_ids)
 
 
 @csrf_exempt
