@@ -1,5 +1,8 @@
 from django.db import models
 
+from selstagram_server import utils
+
+
 # Create your models here.
 
 
@@ -16,26 +19,20 @@ class StringHelperModelMixin(object):
 
 
 class TimeStampedModel(models.Model):
-    created = models.DateTimeField()
-    modified = models.DateTimeField()
+    created = models.DateTimeField(auto_now_add=True)
+    modified = models.DateTimeField(auto_now=True)
 
     class Meta:
         abstract = True
 
 
-class Collectable(models.Model):
-    collected_at = models.DateTimeField(auto_now_add=True)
-    last_updated_at = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        abstract = True
-
-
-class InstagramMedia(Collectable, TimeStampedModel):
+class InstagramMedia(TimeStampedModel):
     id = models.AutoField(primary_key=True)
     tag = models.CharField(max_length=128)
     source_id = models.BigIntegerField(db_index=True)
     source_url = models.URLField(max_length=256)
+    source_date = models.DateTimeField(default=utils.BranchUtil.now)
+
     # slug
     code = models.CharField(max_length=64)
     width = models.PositiveSmallIntegerField()
