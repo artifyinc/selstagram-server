@@ -53,11 +53,13 @@ class Command(BaseCommand):
             # insert_bulk
             # update_bulk
 
-            now = utils.BranchUtil.now()
+            source_date = datetime.datetime.fromtimestamp(media['date'],
+                                                          tz=utils.BranchUtil.SEOUL_TIMEZONE)
             instagram_media, created = selsta101_models. \
                 InstagramMedia.objects.get_or_create(tag=tag,
                                                      source_id=media['id'],
                                                      source_url=media['display_src'],
+                                                     source_date=source_date,
                                                      code=media['code'],
                                                      width=media['dimensions']['width'],
                                                      height=media['dimensions']['height'],
@@ -66,8 +68,7 @@ class Command(BaseCommand):
                                                      caption=media.get('caption', ''),
                                                      comment_count=media['comments']['count'],
                                                      like_count=media['likes']['count'],
-                                                     created=now,
-                                                     modified=now)
+                                                     )
 
             if not created:
                 instagram_media.comment_count = media['comments']['count']
