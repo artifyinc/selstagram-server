@@ -12,7 +12,7 @@ from selstagram_server import utils, test_mixins
 from . import models as selsta101_models
 
 
-class MediaViewTests(test_mixins.InstagramMediaMixin, APITestCase):
+class TagMediaViewTests(test_mixins.InstagramMediaMixin, APITestCase):
     def setUp(self):
         pass
 
@@ -54,7 +54,7 @@ class MediaViewTests(test_mixins.InstagramMediaMixin, APITestCase):
         # When : Invoking media api
         # response = self.client.get('/tags/{tag_name}/media/recent/'.format(tag_name='셀스타그램'))
 
-        response = self.client.get('/tags/셀스타그램2/media/recent/')
+        response = self.client.get('/tags/셀스타그램2/media/')
 
         # Then : InstagramMediaPageNation.default_limit numbers of media must be received
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -70,7 +70,7 @@ class MediaViewTests(test_mixins.InstagramMediaMixin, APITestCase):
         # When : Invoking media api with limit=100 and offset=37
         limit = 100
         offset = 37
-        response = self.client.get('/tags/셀스타그램2/media/recent/'
+        response = self.client.get('/tags/셀스타그램2/media/'
                                    '?limit={limit}&offset={offset}'
                                    .format(limit=limit, offset=offset))
 
@@ -91,7 +91,7 @@ class MediaViewTests(test_mixins.InstagramMediaMixin, APITestCase):
 
         # When : Invoking media api with limit=100
         limit = 100
-        response = self.client.get('/tags/셀스타그램2/media/recent/'
+        response = self.client.get('/tags/셀스타그램2/media/'
                                    '?limit={limit}'.format(limit=limit))
 
         # Then : 100 media elements of which ids are [0, 99] must be received
@@ -111,7 +111,7 @@ class MediaViewTests(test_mixins.InstagramMediaMixin, APITestCase):
 
         # When : Invoking media api with offset=37
         offset = 37
-        response = self.client.get('/tags/셀스타그램2/media/recent/'
+        response = self.client.get('/tags/셀스타그램2/media/'
                                    '?offset={offset}'.format(offset=offset))
 
         # Then : The numbers of media received is as same as
@@ -124,6 +124,57 @@ class MediaViewTests(test_mixins.InstagramMediaMixin, APITestCase):
         ids = range(offset + 1, offset + default_limit + 1)
         self.assertEqual(len(ids), default_limit)
         self.assertSequenceEqual(ids, list(map(lambda item: item['id'], media_.results)))
+
+    def test_media_recent_pagenation_limit_offset(self):
+        # Given : Create 1000 dummy InstagramMedia
+        size = 1000
+        self.create_instagram_media(size)
+
+        # When : Invoking media api with limit=100 and offset=37
+        limit = 100
+        offset = 37
+        response = self.client.get('/tags/셀스타그램2/media/recent/'
+                                   '?limit={limit}&offset={offset}'
+                                   .format(limit=limit, offset=offset))
+
+        # Then : 100 media elements of which ids are [38, 137] must be received
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        media_ = Munch(response.data)
+        self.assertEqual(len(media_.results), limit)
+
+    def test_media_popular_pagenation_limit_offset(self):
+        # Given : Create 1000 dummy InstagramMedia
+        size = 1000
+        self.create_instagram_media(size)
+
+        # When : Invoking media api with limit=100 and offset=37
+        limit = 100
+        offset = 37
+        response = self.client.get('/tags/셀스타그램2/media/popular/'
+                                   '?limit={limit}&offset={offset}'
+                                   .format(limit=limit, offset=offset))
+
+        # Then : 100 media elements of which ids are [38, 137] must be received
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        media_ = Munch(response.data)
+        self.assertEqual(len(media_.results), limit)
+
+    def test_media_rank_pagenation_limit_offset(self):
+        # Given : Create 1000 dummy InstagramMedia
+        size = 1000
+        self.create_instagram_media(size)
+
+        # When : Invoking media api with limit=100 and offset=37
+        limit = 100
+        offset = 37
+        response = self.client.get('/tags/셀스타그램2/media/rank/'
+                                   '?limit={limit}&offset={offset}'
+                                   .format(limit=limit, offset=offset))
+
+        # Then : 100 media elements of which ids are [38, 137] must be received
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        media_ = Munch(response.data)
+        self.assertEqual(len(media_.results), limit)
 
 
 class InstagramMediaPagenatorTest(test_mixins.InstagramMediaMixin, TestCase):

@@ -29,6 +29,14 @@ class InstagramMediaViewSet(viewsets.ModelViewSet):
     def recent(self, request, *args, **kwargs):
         return self.list(request, *args, **kwargs)
 
+    @list_route()
+    def popular(self, request, *args, **kwargs):
+        return self.list(request, *args, **kwargs)
+
+    @list_route()
+    def rank(self, request, *args, **kwargs):
+        return self.list(request, *args, **kwargs)
+
 
 class TagViewSet(viewsets.ModelViewSet):
     serializer_class = TagSerializer
