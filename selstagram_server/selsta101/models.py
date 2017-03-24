@@ -26,9 +26,20 @@ class TimeStampedModel(models.Model):
         abstract = True
 
 
+class Tag(StringHelperModelMixin, TimeStampedModel):
+    id = models.AutoField(primary_key=True)
+    name = models.CharField(max_length=256, unique=True)
+
+    # FIXME
+    # add meta information of the tag
+
+    def __str__(self):
+        return self.field_list_to_string([self.id, self.name])
+
+
 class InstagramMedia(StringHelperModelMixin, TimeStampedModel):
     id = models.AutoField(primary_key=True)
-    tag = models.CharField(max_length=128)
+    tag = models.ForeignKey(Tag, on_delete=models.PROTECT)
     source_id = models.BigIntegerField(db_index=True)
     source_url = models.URLField(max_length=256)
     source_date = models.DateTimeField(default=utils.BranchUtil.now)
@@ -47,4 +58,4 @@ class InstagramMedia(StringHelperModelMixin, TimeStampedModel):
     like_count = models.PositiveIntegerField()
 
     def __str__(self):
-        return self.field_list_to_string([self.code, self.caption])
+        return self.field_list_to_string([self.source_date, self.code, self.caption])

@@ -16,16 +16,20 @@ Including another URLconf
 from django.conf.urls import url, include
 from django.contrib import admin
 
-from rest_framework import routers
+from rest_framework_nested import routers as drf_nested_routers
+from rest_framework import routers as drf_routers
 
 from selsta101 import views as selsta101_views
 
-router = routers.DefaultRouter()
-router.register('media', selsta101_views.InstagramMediaViewSet)
+router = drf_nested_routers.DefaultRouter()
+router.register('tags', selsta101_views.TagViewSet)
 
+tags_router = drf_nested_routers.NestedSimpleRouter(router, 'tags', lookup='tag')
+tags_router.register('media', selsta101_views.InstagramMediaViewSet)
 
 urlpatterns = [
-    url(r'^', include(router.urls)),
     url(r'^verify_receipt', selsta101_views.verify_receipt),
     url(r'^admin/', admin.site.urls),
+    url(r'^', include(router.urls)),
+    url(r'^', include(tags_router.urls)),
 ]

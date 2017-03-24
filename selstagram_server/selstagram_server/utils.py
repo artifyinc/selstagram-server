@@ -1,9 +1,10 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 import datetime
+
 from dateutil.relativedelta import relativedelta
-from pytz import timezone as pytz_timezone
 from django.utils import timezone as django_timezone
+from pytz import timezone as pytz_timezone
 
 
 class BranchUtil(object):
