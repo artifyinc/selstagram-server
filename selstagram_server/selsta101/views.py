@@ -25,19 +25,18 @@ class InstagramMediaViewSet(viewsets.ModelViewSet):
 
 @csrf_exempt
 def verify_receipt(request):
-    payload = json.loads(request.body)
+    payload = json.loads(str(request.body, 'utf-8'))
     receipt_data = payload["receipt-data"]
     if payload.get("new", None):
         product_identifier = payload["new"]["productIdentifier"]
         requests.post(url=os.environ['SELSTA101_SLACK_INCOMING_HOOK_URL'],
                       json={"text": "New Customer: " + product_identifier})
     code, expires_date_ms = _verify_itunes_receipt(receipt_data=receipt_data)
-
     return JsonResponse({"code": code, "expires_date_ms": expires_date_ms})
 
 
 def _verify_itunes_receipt(receipt_data):
-    expires_date_ms = 0
+    expires_date_ms = "0"
     code = 200
     itunes_shared_secret = os.environ['SELSTA101_ITUNES_SHARED_SECRET']
 
@@ -60,6 +59,7 @@ def _verify_itunes_receipt(receipt_data):
         log.error("iTunesServerNotReachable")
     except Exception:
         code = 500
+        log.error("Unexpected error, itunesiap")
 
     if code == 500:
         """This case is a bug in itunesiap module on rare. It will be working to try once again."""
