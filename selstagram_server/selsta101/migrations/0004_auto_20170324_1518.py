@@ -7,7 +7,16 @@ import django.db.models.deletion
 import selsta101.models
 
 
+def create_initial_tag(apps, schema_editor):
+    if not schema_editor.connection.alias == 'default':
+        return
+
+    Tag = apps.get_model('selsta101', 'Tag')
+    Tag.objects.create(name='셀스타그램')
+
+
 class Migration(migrations.Migration):
+    atomic = True
 
     dependencies = [
         ('selsta101', '0003_auto_20170323_1020'),
@@ -27,9 +36,29 @@ class Migration(migrations.Migration):
             },
             bases=(selsta101.models.StringHelperModelMixin, models.Model),
         ),
+
+        migrations.RemoveField(
+            model_name='instagrammedia',
+            name='tag'
+        ),
+
+        migrations.AddField(
+            model_name='instagrammedia',
+            name='tag',
+            field=models.ForeignKey(on_delete=django.db.models.deletion.PROTECT,
+                                    to='selsta101.Tag',
+                                    null=True),
+        ),
+
+        migrations.RunPython(create_initial_tag),
+
+        migrations.RunSQL('UPDATE selsta101_instagrammedia '
+                          'SET tag_id = (SELECT min(id) from selsta101_tag);'),
+
         migrations.AlterField(
             model_name='instagrammedia',
             name='tag',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='selsta101.Tag'),
+            field=models.ForeignKey(on_delete=django.db.models.deletion.PROTECT,
+                                    to='selsta101.Tag'),
         ),
     ]
