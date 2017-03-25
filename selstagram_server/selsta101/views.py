@@ -8,10 +8,12 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework import permissions
 from rest_framework import viewsets
+from rest_framework.decorators import list_route
+from rest_framework.pagination import LimitOffsetPagination
 
 from selsta101.pagenation import InstagramMediaPageNation
-from .models import InstagramMedia
-from .serializers import InstagramMediaSerializer
+from .models import InstagramMedia, Tag
+from .serializers import InstagramMediaSerializer, TagSerializer
 
 log = logging.getLogger(__name__)
 
@@ -21,7 +23,27 @@ class InstagramMediaViewSet(viewsets.ModelViewSet):
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
     pagination_class = InstagramMediaPageNation
     queryset = InstagramMedia.objects.order_by('id').all()
+    lookup_field = 'id'
 
+    @list_route()
+    def recent(self, request, *args, **kwargs):
+        return self.list(request, *args, **kwargs)
+
+    @list_route()
+    def popular(self, request, *args, **kwargs):
+        return self.list(request, *args, **kwargs)
+
+    @list_route()
+    def rank(self, request, *args, **kwargs):
+        return self.list(request, *args, **kwargs)
+
+
+class TagViewSet(viewsets.ModelViewSet):
+    serializer_class = TagSerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+    pagination_class = LimitOffsetPagination
+    queryset = Tag.objects.all()
+    lookup_field = 'name'
 
 @csrf_exempt
 def verify_receipt(request):

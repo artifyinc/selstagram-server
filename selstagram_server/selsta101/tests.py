@@ -1,42 +1,78 @@
+import json
+
 from django.http import HttpRequest
 from django.test import TestCase
 from munch import Munch
 from rest_framework import status
+from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.test import APITestCase
 
 from selsta101.views import InstagramMediaPageNation
-from selstagram_server import utils
-from . import factories
+from selstagram_server import utils, test_mixins
 from . import models as selsta101_models
 
 
-class MediaViewTests(APITestCase):
+class TagMediaViewTests(test_mixins.InstagramMediaMixin, APITestCase):
     def setUp(self):
         pass
+
+    def test_tags(self):
+        # Given : Create 1000 dummy InstagramMedia
+        size = 1000
+        self.create_tags(size)
+
+        # When : Invoking media api
+        response = self.client.get('/tags/')
+
+        # Then : LimitOffsetPagination.default_limit media elements must be received
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        media_ = Munch(response.data)
+        self.assertEqual(len(media_.results), LimitOffsetPagination.default_limit)
+
+    def test_tags_tag_name(self):
+        # Given : Create 1000 dummy InstagramMedia
+        size = 1000
+        self.create_tags(size)
+
+        tag_id = 3
+        tag_name = selsta101_models.Tag.objects.get(id=tag_id).name
+
+        # When : Invoking media api
+        response = self.client.get('/tags/{tag_name}/'.format(tag_name=tag_name))
+
+        # Then : LimitOffsetPagination.default_limit media elements must be received
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        media_ = Munch(response.data)
+
+        self.assertEqual(media_.id, tag_id)
 
     def test_media(self):
         # Given : Create 1000 dummy InstagramMedia
         size = 1000
-        factories.InstagramMediaFactory.create_batch(size=size)
+        self.create_instagram_media(size)
 
         # When : Invoking media api
-        response = self.client.get('/media/')
+        # response = self.client.get('/tags/{tag_name}/media/recent/'.format(tag_name='셀스타그램'))
 
-        # Then : 10 media elements must be received
+        response = self.client.get('/tags/셀스타그램2/media/')
+
+        # Then : InstagramMediaPageNation.default_limit numbers of media must be received
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+
         media_ = Munch(response.data)
         self.assertEqual(len(media_.results), InstagramMediaPageNation.default_limit)
 
     def test_media_pagenation_limit_offset(self):
         # Given : Create 1000 dummy InstagramMedia
         size = 1000
-        factories.InstagramMediaFactory.create_batch(size=size)
+        self.create_instagram_media(size)
 
         # When : Invoking media api with limit=100 and offset=37
         limit = 100
         offset = 37
-        response = self.client.get('/media/?limit={limit}&offset={offset}'.format(limit=limit,
-                                                                                  offset=offset))
+        response = self.client.get('/tags/셀스타그램2/media/'
+                                   '?limit={limit}&offset={offset}'
+                                   .format(limit=limit, offset=offset))
 
         # Then : 100 media elements of which ids are [38, 137] must be received
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -51,11 +87,12 @@ class MediaViewTests(APITestCase):
     def test_media_pagenation_limit(self):
         # Given : Create 1000 dummy InstagramMedia
         size = 1000
-        factories.InstagramMediaFactory.create_batch(size=size)
+        self.create_instagram_media(size)
 
         # When : Invoking media api with limit=100
         limit = 100
-        response = self.client.get('/media/?limit={limit}'.format(limit=limit))
+        response = self.client.get('/tags/셀스타그램2/media/'
+                                   '?limit={limit}'.format(limit=limit))
 
         # Then : 100 media elements of which ids are [0, 99] must be received
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -70,11 +107,12 @@ class MediaViewTests(APITestCase):
     def test_media_pagenation_offset(self):
         # Given : Create 1000 dummy InstagramMedia
         size = 1000
-        factories.InstagramMediaFactory.create_batch(size=size)
+        self.create_instagram_media(size)
 
         # When : Invoking media api with offset=37
         offset = 37
-        response = self.client.get('/media/?offset={offset}'.format(offset=offset))
+        response = self.client.get('/tags/셀스타그램2/media/'
+                                   '?offset={offset}'.format(offset=offset))
 
         # Then : The numbers of media received is as same as
         # InstagramMediaPageNation.default_limit
@@ -87,20 +125,69 @@ class MediaViewTests(APITestCase):
         self.assertEqual(len(ids), default_limit)
         self.assertSequenceEqual(ids, list(map(lambda item: item['id'], media_.results)))
 
+    def test_media_recent_pagenation_limit_offset(self):
+        # Given : Create 1000 dummy InstagramMedia
+        size = 1000
+        self.create_instagram_media(size)
 
-class InstagramMediaPagenatorTest(TestCase):
+        # When : Invoking media api with limit=100 and offset=37
+        limit = 100
+        offset = 37
+        response = self.client.get('/tags/셀스타그램2/media/recent/'
+                                   '?limit={limit}&offset={offset}'
+                                   .format(limit=limit, offset=offset))
+
+        # Then : 100 media elements of which ids are [38, 137] must be received
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        media_ = Munch(response.data)
+        self.assertEqual(len(media_.results), limit)
+
+    def test_media_popular_pagenation_limit_offset(self):
+        # Given : Create 1000 dummy InstagramMedia
+        size = 1000
+        self.create_instagram_media(size)
+
+        # When : Invoking media api with limit=100 and offset=37
+        limit = 100
+        offset = 37
+        response = self.client.get('/tags/셀스타그램2/media/popular/'
+                                   '?limit={limit}&offset={offset}'
+                                   .format(limit=limit, offset=offset))
+
+        # Then : 100 media elements of which ids are [38, 137] must be received
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        media_ = Munch(response.data)
+        self.assertEqual(len(media_.results), limit)
+
+    def test_media_rank_pagenation_limit_offset(self):
+        # Given : Create 1000 dummy InstagramMedia
+        size = 1000
+        self.create_instagram_media(size)
+
+        # When : Invoking media api with limit=100 and offset=37
+        limit = 100
+        offset = 37
+        response = self.client.get('/tags/셀스타그램2/media/rank/'
+                                   '?limit={limit}&offset={offset}'
+                                   .format(limit=limit, offset=offset))
+
+        # Then : 100 media elements of which ids are [38, 137] must be received
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        media_ = Munch(response.data)
+        self.assertEqual(len(media_.results), limit)
+
+
+class InstagramMediaPagenatorTest(test_mixins.InstagramMediaMixin, TestCase):
     def test_today_offset_reset(self):
         # Given: There are 1000 InstagramMedia crawled yesterday and 1000 InstagramMedia crawled today.
         size = 1000
-        factories.InstagramMediaFactory \
-            .create_batch(size=size,
-                          source_date=utils.BranchUtil.date_to_datetime(
-                              utils.BranchUtil.yesterday()))
+        self.create_instagram_media(size,
+                                    source_date=utils.BranchUtil.date_to_datetime(
+                                        utils.BranchUtil.yesterday()))
 
-        factories.InstagramMediaFactory \
-            .create_batch(size=size,
-                          source_date=utils.BranchUtil.date_to_datetime(
-                              utils.BranchUtil.today()))
+        self.create_instagram_media(size,
+                                    source_date=utils.BranchUtil.date_to_datetime(
+                                        utils.BranchUtil.today()))
 
         self.assertEqual(selsta101_models.InstagramMedia.objects.count(), 2 * size)
 
@@ -121,15 +208,13 @@ class InstagramMediaPagenatorTest(TestCase):
     def test_today_offset(self):
         # Given: There are 1000 InstagramMedia crawled yesterday and 1000 InstagramMedia crawled today.
         size = 1000
-        factories.InstagramMediaFactory \
-            .create_batch(size=size,
-                          source_date=utils.BranchUtil.date_to_datetime(
-                              utils.BranchUtil.yesterday()))
+        self.create_instagram_media(size,
+                                    source_date=utils.BranchUtil.date_to_datetime(
+                                        utils.BranchUtil.yesterday()))
 
-        factories.InstagramMediaFactory \
-            .create_batch(size=size,
-                          source_date=utils.BranchUtil.date_to_datetime(
-                              utils.BranchUtil.today()))
+        self.create_instagram_media(size,
+                                    source_date=utils.BranchUtil.date_to_datetime(
+                                        utils.BranchUtil.today()))
 
         self.assertEqual(selsta101_models.InstagramMedia.objects.count(), 2 * size)
 
