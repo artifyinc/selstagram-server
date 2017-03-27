@@ -46,7 +46,7 @@ def _verify_itunes_receipt(receipt_data):
             in_apps = response.receipt.in_app
             for i in in_apps:
                 new_expires_date_ms = i["expires_date_ms"]
-                if new_expires_date_ms > expires_date_ms:
+                if int(new_expires_date_ms) > int(expires_date_ms):
                     expires_date_ms = new_expires_date_ms
     except itunesiap.exc.InvalidReceipt:
         code = 400
