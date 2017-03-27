@@ -1,5 +1,3 @@
-import json
-
 from django.http import HttpRequest
 from django.test import TestCase
 from munch import Munch
@@ -160,17 +158,21 @@ class TagMediaViewTests(test_mixins.InstagramMediaMixin, APITestCase):
         self.assertEqual(len(media_.results), limit)
 
     def test_media_rank(self):
-        # Given : Create 1000 dummy InstagramMedia
-        size = 1000
-        self.create_instagram_media(size)
+        # Given : from today to 6 days ago for a week,
+        #         create 101 InstagramMedia for a each day.
+        #         Rank those by votes. all votes are zero
+        self.create_ranks()
 
-        # When : Invoking media rank api with limit=100 and offset=37
+        # When : Invoking media rank api
         response = self.client.get('/tags/셀스타그램/media/rank/')
 
-        # Then : 100 media elements of which ids are [38, 137] must be received
+        # Then : for each 6 days, there must be 101 medias from rank 1 to rank101.
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        media_ = Munch(response.data)
-        self.assertEqual(len(media_.results), InstagramMediaPageNation.default_limit)
+        self.assertEqual(7, len(response.data))
+
+        for item in response.data:
+            daily_rank = Munch(item)
+            self.assertEqual(101, len(daily_rank.rank))
 
 
 class InstagramMediaPagenatorTest(test_mixins.InstagramMediaMixin, TestCase):

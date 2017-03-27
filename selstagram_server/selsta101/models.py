@@ -56,6 +56,14 @@ class InstagramMedia(StringHelperModelMixin, TimeStampedModel):
     caption = models.TextField()
     comment_count = models.PositiveIntegerField()
     like_count = models.PositiveIntegerField()
+    votes = models.PositiveIntegerField(default=0)
 
     def __str__(self):
         return self.field_list_to_string([self.source_date, self.code, self.caption])
+
+
+class DailyRank(StringHelperModelMixin, TimeStampedModel):
+    id = models.AutoField(primary_key=True)
+    date = models.DateField(db_index=True)
+    rank = models.SmallIntegerField()
+    media = models.ForeignKey(InstagramMedia, on_delete=models.PROTECT)
