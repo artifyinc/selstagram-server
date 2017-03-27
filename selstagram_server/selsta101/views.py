@@ -10,6 +10,7 @@ from rest_framework import permissions
 from rest_framework import viewsets
 from rest_framework.decorators import list_route
 from rest_framework.pagination import LimitOffsetPagination
+from rest_framework.response import Response
 
 from selsta101.pagenation import InstagramMediaPageNation
 from .models import InstagramMedia, Tag
@@ -22,8 +23,24 @@ class InstagramMediaViewSet(viewsets.ModelViewSet):
     serializer_class = InstagramMediaSerializer
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
     pagination_class = InstagramMediaPageNation
-    queryset = InstagramMedia.objects.order_by('id').all()
     lookup_field = 'id'
+
+    def get_queryset(self):
+        return InstagramMedia.objects.order_by('id').all()
+
+    def list(self, request, tag_name=None):
+        queryset = self.get_queryset()
+
+        if tag_name:
+            queryset = queryset.filter(tag__name=tag_name)
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
 
     @list_route()
     def recent(self, request, *args, **kwargs):
