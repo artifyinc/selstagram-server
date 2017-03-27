@@ -19,8 +19,8 @@ class Command(BaseCommand):
         parser.add_argument('--tag', action='store', default='selfie', help='tag name to crawl')
         parser.add_argument('--time', action='store', help='(2017-03-03:2017-03-03)')
         parser.add_argument('--credential', action='store', help='my_insta_id:my_password', required=True)
-        parser.add_argument('--count', action='store', help='number of photos to crawl. '
-                                                            'IF NOT, all tagged photo are crawled')
+        parser.add_argument('--count', action='store',
+                            help='number of photos to crawl. IF NOT, all tagged photo are crawled')
 
     def handle(self, *args, **options):
         tag = options['tag']
@@ -47,6 +47,8 @@ class Command(BaseCommand):
 
         timeframe = get_times_from_cli(time_string)
 
+        tag_object, created = selsta101_models.Tag.objects.get_or_create(name=tag)
+
         for media in self.instagram_crawler.medias(media_count=count,
                                                    timeframe=timeframe):
             # FIXME
@@ -56,7 +58,7 @@ class Command(BaseCommand):
             source_date = datetime.datetime.fromtimestamp(media['date'],
                                                           tz=utils.BranchUtil.SEOUL_TIMEZONE)
             instagram_media, created = selsta101_models. \
-                InstagramMedia.objects.get_or_create(tag=tag,
+                InstagramMedia.objects.get_or_create(tag=tag_object,
                                                      source_id=media['id'],
                                                      source_url=media['display_src'],
                                                      source_date=source_date,
