@@ -86,19 +86,18 @@ class TagViewSet(viewsets.ModelViewSet):
 
 @csrf_exempt
 def verify_receipt(request):
-    payload = json.loads(request.body)
+    payload = json.loads(str(request.body, 'utf-8'))
     receipt_data = payload["receipt-data"]
     if payload.get("new", None):
         product_identifier = payload["new"]["productIdentifier"]
         requests.post(url=os.environ['SELSTA101_SLACK_INCOMING_HOOK_URL'],
                       json={"text": "New Customer: " + product_identifier})
     code, expires_date_ms = _verify_itunes_receipt(receipt_data=receipt_data)
-
     return JsonResponse({"code": code, "expires_date_ms": expires_date_ms})
 
 
 def _verify_itunes_receipt(receipt_data):
-    expires_date_ms = 0
+    expires_date_ms = "0"
     code = 200
     itunes_shared_secret = os.environ['SELSTA101_ITUNES_SHARED_SECRET']
 
@@ -108,7 +107,7 @@ def _verify_itunes_receipt(receipt_data):
             in_apps = response.receipt.in_app
             for i in in_apps:
                 new_expires_date_ms = i["expires_date_ms"]
-                if new_expires_date_ms > expires_date_ms:
+                if int(new_expires_date_ms) > int(expires_date_ms):
                     expires_date_ms = new_expires_date_ms
     except itunesiap.exc.InvalidReceipt:
         code = 400
@@ -121,6 +120,7 @@ def _verify_itunes_receipt(receipt_data):
         log.error("iTunesServerNotReachable")
     except Exception:
         code = 500
+        log.error("Unexpected error, itunesiap")
 
     if code == 500:
         """This case is a bug in itunesiap module on rare. It will be working to try once again."""
