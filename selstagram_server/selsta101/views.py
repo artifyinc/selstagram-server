@@ -5,11 +5,13 @@ import os
 import itunesiap
 import requests
 from dateutil.relativedelta import relativedelta
+from django.db import transaction
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework import permissions
+from rest_framework import status
 from rest_framework import viewsets
-from rest_framework.decorators import list_route
+from rest_framework.decorators import list_route, detail_route
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.response import Response
 
@@ -23,7 +25,7 @@ log = logging.getLogger(__name__)
 
 class InstagramMediaViewSet(viewsets.ModelViewSet):
     serializer_class = InstagramMediaSerializer
-    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+    # permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
     pagination_class = InstagramMediaPageNation
     lookup_field = 'id'
 
@@ -74,6 +76,18 @@ class InstagramMediaViewSet(viewsets.ModelViewSet):
 
         serializer = RankSerializer(daily_ranks_for_a_week, many=True)
         return Response(serializer.data)
+
+    @detail_route(methods=['post'])
+    def vote(self, request, id=None):
+        if not id:
+            return Response(data="id is null", status=status.HTTP_400_BAD_REQUEST)
+
+        with transaction.atomic():
+            instagram_media = InstagramMedia.objects.select_for_update().get(id=id)
+            instagram_media.votes += 1
+            instagram_media.save()
+
+            return Response(status=status.HTTP_201_CREATED)
 
 
 class TagViewSet(viewsets.ModelViewSet):

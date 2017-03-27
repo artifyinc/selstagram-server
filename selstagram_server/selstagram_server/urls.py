@@ -23,6 +23,7 @@ from selsta101 import views as selsta101_views
 
 router = drf_nested_routers.DefaultRouter()
 router.register('tags', selsta101_views.TagViewSet)
+router.register('media', selsta101_views.InstagramMediaViewSet, base_name='media')
 
 tags_router = drf_nested_routers.NestedSimpleRouter(router, 'tags', lookup='tag')
 tags_router.register('media', selsta101_views.InstagramMediaViewSet, base_name='media')

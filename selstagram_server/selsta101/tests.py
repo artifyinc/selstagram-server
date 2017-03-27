@@ -174,6 +174,20 @@ class TagMediaViewTests(test_mixins.InstagramMediaMixin, APITestCase):
             daily_rank = Munch(item)
             self.assertEqual(101, len(daily_rank.rank))
 
+    def test_vote_api(self):
+        # Given : Create 1 dummy InstagramMedia
+        size = 1
+        self.create_instagram_media(size)
+        instagram_media = selsta101_models.InstagramMedia.objects.first()
+        before_vote = instagram_media.votes
+
+        # When : Invoking vote api
+        response = self.client.post('/media/{id}/vote/'.format(id=instagram_media.id))
+
+        # Then : vote should be incremented by 1
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(before_vote + 1, selsta101_models.InstagramMedia.objects.first().votes)
+
 
 class InstagramMediaPagenatorTest(test_mixins.InstagramMediaMixin, TestCase):
     def test_today_offset_reset(self):
