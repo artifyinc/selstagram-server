@@ -4,6 +4,7 @@ import os
 
 import itunesiap
 import requests
+from dateutil.relativedelta import relativedelta
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework import permissions
@@ -13,8 +14,9 @@ from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.response import Response
 
 from selsta101.pagenation import InstagramMediaPageNation
-from .models import InstagramMedia, Tag
-from .serializers import InstagramMediaSerializer, TagSerializer
+from selstagram_server import utils
+from .models import InstagramMedia, Tag, DailyRank
+from .serializers import InstagramMediaSerializer, TagSerializer, RankSerializer
 
 log = logging.getLogger(__name__)
 
@@ -52,7 +54,26 @@ class InstagramMediaViewSet(viewsets.ModelViewSet):
 
     @list_route()
     def rank(self, request, *args, **kwargs):
-        return self.list(request, *args, **kwargs)
+        daily_ranks_for_a_week = []
+
+        now = utils.BranchUtil.now()
+        queryset = self.get_queryset()
+
+        for i in range(0, 7):
+            date = (now - relativedelta(days=i)).date()
+            daily_queryset = queryset.filter(source_date__date=date).order_by('-votes')
+            count = daily_queryset.count()
+
+            if count > 0:
+                size = min(count, 101)
+                daily_rank = {'date': date,
+                              'rank': [DailyRank(date=date, rank=index + 1, media=instagram_media)
+                                       for index, instagram_media in
+                                       enumerate(daily_queryset[0:size])]}
+                daily_ranks_for_a_week.append(daily_rank)
+
+        serializer = RankSerializer(daily_ranks_for_a_week, many=True)
+        return Response(serializer.data)
 
 
 class TagViewSet(viewsets.ModelViewSet):
@@ -61,6 +82,7 @@ class TagViewSet(viewsets.ModelViewSet):
     pagination_class = LimitOffsetPagination
     queryset = Tag.objects.all()
     lookup_field = 'name'
+
 
 @csrf_exempt
 def verify_receipt(request):
