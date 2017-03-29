@@ -2,10 +2,9 @@
 # -*- coding: utf-8 -*-
 from dateutil.relativedelta import relativedelta
 
-from selstagram_server import utils
-
 from selsta101 import factories as selsta101_factories
 from selsta101 import models as selsta101_models
+from selstagram_server import utils
 
 
 class InstagramMediaMixin(object):
