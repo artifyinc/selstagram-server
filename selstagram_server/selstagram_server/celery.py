@@ -3,6 +3,7 @@
 
 from celery import Celery
 from celery.schedules import crontab
+from django.core.management import call_command
 
 celery_app = Celery('selstagram_server', backend='django-db')
 
@@ -16,26 +17,25 @@ celery_app.config_from_object('django.conf:settings', namespace='CELERY')
 celery_app.autodiscover_tasks()
 
 
-@celery_app.task(bind=True)
-def debug_task(self):
-    print('Request: {0!r}'.format(self.request))
+@celery_app.task
+def crawl_instagram_tag(tag, count_limit, credential):
+    args = [
+        '--tag', tag,
+        '--time', 'thisday',
+        '--credential', credential,
+        '--count', count_limit
+    ]
+    call_command('crawl', *args)
 
 
 @celery_app.on_after_configure.connect
 def setup_periodic_tasks(sender, **kwargs):
-    # Calls test('hello') every 10 seconds.
-    sender.add_periodic_task(10.0, test.s('hello'), name='add every 10')
+    # sender.add_periodic_task(
+    #     crontab(hour='*/2'),
+    #     crawl_instagram_tag.s('셀스타그램', 80000, '3times3meals:selsta101!')
+    # )
 
-    # Calls test('world') every 30 seconds
-    sender.add_periodic_task(30.0, test.s('world'), expires=10)
-
-    # Executes every Monday morning at 7:30 a.m.
     sender.add_periodic_task(
-        crontab(hour=7, minute=30, day_of_week=1),
-        test.s('Happy Mondays!'),
+        crontab(minute=19),
+        crawl_instagram_tag.s('셀스타그램', 80000, '3times3meals:selsta101!')
     )
-
-
-@celery_app.task
-def test(arg):
-    print(arg)
