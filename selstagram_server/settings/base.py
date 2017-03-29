@@ -38,6 +38,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_celery_results',
+    'django_celery_beat',
     'rest_framework',
     'selsta101',
 ]
@@ -115,3 +117,7 @@ STATIC_URL = '/static/'
 REST_FRAMEWORK = {
     'PAGE_SIZE': 100
 }
+
+CELERY_RESULT_BACKEND = 'django-db'
+CELERY_TIMEZONE = 'Asia/Seoul'
+
