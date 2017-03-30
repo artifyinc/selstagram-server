@@ -15,8 +15,6 @@ DATABASES = {
     },
 }
 
-# FIXME
-# Remove DEBUG and fix ALLOWED_HOST
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['*']
