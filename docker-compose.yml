@@ -1,0 +1,23 @@
+version: '2'
+services:
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      -"5672:5672"
+      -"15672:15672"
+
+  django_nginx:
+    image: selstagram-django:latest
+    container_name: django01
+    ports:
+      - "80:80"
+    volumes:
+      - ./src:/src
+      - ./config/nginx:/etc/nginx/conf.d
+    depends_on:
+      - rabbitmq
+
+#  db:
+#    image: postgres:latest
+#    container_name: ps01
