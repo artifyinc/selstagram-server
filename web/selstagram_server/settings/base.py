@@ -119,6 +119,8 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 100
 }
 
+
+# settings for celery
 CELERY_RESULT_BACKEND = 'django-db'
 CELERY_TIMEZONE = 'Asia/Seoul'
-
+CELERY_BROKER_URL = os.getenv('BROKER_URL', 'amqp://guest:guest@127.0.0.1//')

@@ -5,9 +5,11 @@ services:
     container_name: rabbitmq
 
   django_nginx:
+    environment:
+      - BROKER_URL=amqp://guest:guest@rabbitmq//
     image: selstagram-django:0.1
     container_name: django01
     ports:
-      - "8000:80"
-    depends_on:
+      - "80:80"
+    links:
       - rabbitmq
