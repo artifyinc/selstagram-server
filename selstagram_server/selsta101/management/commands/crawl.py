@@ -1,6 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 import datetime
+import logging
 
 from django.core.management import BaseCommand
 from instaLooter.core import InstaLooter
@@ -9,12 +10,11 @@ from instaLooter.utils import get_times_from_cli, get_times
 from selsta101 import models as selsta101_models
 from selstagram_server import utils
 
-'''
-    instagram hashtag crawler
-'''
+logger = logging.getLogger(__name__)
 
 
 class Command(BaseCommand):
+    # instagram hashtag crawler
     def add_arguments(self, parser):
         parser.add_argument('--tag', action='store', default='selfie', help='tag name to crawl')
         parser.add_argument('--time', action='store', help='(2017-03-03:2017-03-03)')
@@ -76,6 +76,8 @@ class Command(BaseCommand):
                 instagram_media.comment_count = media['comments']['count']
                 instagram_media.like_count = media['likes']['count']
                 instagram_media.save()
+
+            logger.info(instagram_media.id, instagram_media.code, instagram_media.source_url, instagram_media.caption[0:20])
 
 
 class InstagramCrawler(InstaLooter):
