@@ -3,6 +3,7 @@ MAINTAINER Yoonje Choi <yoonjechoi@gmail.com>
 
 ENV PYTHONUNBUFFERED 1
 ENV USERNAME selstagram
+ENV DJANGO_SETTINGS settings.production
 
 
 RUN apt-get update
@@ -13,7 +14,8 @@ RUN apt-get update
 RUN mkdir /git-repo
 WORKDIR /git-repo
 RUN git clone https://github.com/artifyinc/selstagram-server
-RUN pip install -r /config/requirements.txt
+WORKDIR /git-repo/selstagram-server
+RUN pip install -r web/requirements.txt
 
 # nginx
 RUN apt-get install -y nginx
@@ -27,8 +29,6 @@ RUN chown -R www-data:www-data /var/lib/nginx
 
 # create unprivileged user
 
-#
-
 #RUN apt-get install -y supervisor
 #ADD ./conf/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
@@ -40,6 +40,3 @@ ADD nginx/selstagram.ini /etc/uwsgi/sites/selstagram.ini
 
 EXPOSE 80
 EXPOSE 443
-
-PUBLISH 80
-PUBLISH 443

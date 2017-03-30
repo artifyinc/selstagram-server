@@ -3,20 +3,17 @@ services:
   rabbitmq:
     image: rabbitmq:3-management
     container_name: rabbitmq
-    ports:
-      -"5672:5672"
-      -"15672:15672"
 
   django_nginx:
-    image: selstagram-django:latest
+    image: selstagram-django:0.1
     container_name: django01
     ports:
-      - "80:80"
-    volumes:
-      - ./src:/src
-      - ./config/nginx:/etc/nginx/conf.d
+      - "8000:80"
     depends_on:
       - rabbitmq
+
+    volumes:
+      - /Users/yoonjechoi/git-repo/selstagram-server:/git-repo/selstagram-server
 
 #  db:
 #    image: postgres:latest
