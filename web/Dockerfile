@@ -1,42 +1,34 @@
 FROM python:3.4.6
 MAINTAINER Yoonje Choi <yoonjechoi@gmail.com>
 
-ENV PYTHONUNBUFFERED 1
-ENV USERNAME selstagram
-ENV DJANGO_SETTINGS settings.production
-
-
 RUN apt-get update
-#RUN adduser --disabled-password --gecos '' ${USERNAME}
-#RUN su ${USERNAME}
-#RUN git clone https://github.com/pyenv/pyenv.git ~/.pyenv
+RUN apt-get upgrade -y
+RUN apt-get install -y nginx supervisor
+RUN pip install uwsgi
 
-RUN mkdir /git-repo
-WORKDIR /git-repo
-RUN git clone https://github.com/artifyinc/selstagram-server
-WORKDIR /git-repo/selstagram-server
-RUN pip install -r web/requirements.txt
 
-# nginx
-RUN apt-get install -y nginx
+# setup nginx
+RUN echo "daemon off;" >> /etc/nginx/nginx.conf
+RUN rm /etc/nginx/sites-enabled/default
+
 ADD nginx/selstagram-server /etc/nginx/sites-available/selstagram-server
 RUN ln -s /etc/nginx/sites-available/selstagram-server /etc/nginx/sites-enabled/
-RUN rm /etc/nginx/sites-enabled/default
-RUN echo "\ndaemon off;" >> /etc/nginx/nginx.conf
-RUN chown -R www-data:www-data /var/lib/nginx
+ADD supervisor-selstagram.conf /etc/supervisor/conf.d/
 
 
+# install pip requirements
+ADD requirements.txt /home/docker/code/requirements.txt
+RUN pip install -r /home/docker/code/requirements.txt
 
-# create unprivileged user
+# copy source code
+ADD . /home/docker/code/
 
-#RUN apt-get install -y supervisor
-#ADD ./conf/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
-# uWSGI
-RUN pip install uwsgi
-ADD nginx/selstagram.ini /etc/uwsgi/sites/selstagram.ini
-
-#CMD ["/usr/bin/supervisord"]
+WORKDIR /home/docker/code/selstagram_server
+RUN python manage.py collectstatic --no-input
 
 EXPOSE 80
 EXPOSE 443
+
+CMD ["supervisord", "-n"]
+

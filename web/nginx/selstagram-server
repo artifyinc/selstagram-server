@@ -6,4 +6,8 @@ server {
         uwsgi_pass unix:///tmp/selstagram_server_uwsgi.sock;
         include uwsgi_params;
     }
+
+    location /static {
+        alias /home/docker/code/selstagram_server/static;
+    }
 }

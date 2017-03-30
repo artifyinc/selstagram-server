@@ -11,10 +11,3 @@ services:
       - "8000:80"
     depends_on:
       - rabbitmq
-
-    volumes:
-      - /Users/yoonjechoi/git-repo/selstagram-server:/git-repo/selstagram-server
-
-#  db:
-#    image: postgres:latest
-#    container_name: ps01
