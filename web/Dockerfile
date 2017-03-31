@@ -21,14 +21,25 @@ ADD requirements.txt /home/docker/code/requirements.txt
 RUN pip install -r /home/docker/code/requirements.txt
 
 # copy source code
-ADD . /home/docker/code/
-
+ADD selstagram_server /home/docker/code/selstagram_server
+ADD selstagram.ini /home/docker/code/
 
 WORKDIR /home/docker/code/selstagram_server
+
+ARG PYTHONUNBUFFERED
+ARG BROKER_URL
+ARG DB_HOSTNAME
+ARG DB_USERNAME
+ARG DB_PASSWORD
+ARG DB_NAME
+ARG DJANGO_SETTINGS_MODULE
+ARG SELSTA101_SLACK_INCOMING_HOOK_URL
+ARG SELSTA101_ITUNES_SHARED_SECRET
+
 RUN python manage.py collectstatic --no-input
 
 EXPOSE 80
 EXPOSE 443
 
+RUN mkdir /home/docker/log
 CMD ["supervisord", "-n"]
-
