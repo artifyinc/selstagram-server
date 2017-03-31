@@ -1,12 +1,4 @@
-db.sqlite3
 
-*.py[co]
-__pycache__
-.idea
-env/
-logs/
-static/
-environment_variables
 # Elastic Beanstalk Files
 .elasticbeanstalk/*
 !.elasticbeanstalk/*.cfg.yml

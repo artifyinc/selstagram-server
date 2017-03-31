@@ -7,7 +7,7 @@ services:
   django_nginx:
     env_file:
       - web/environment_variables
-    image: yoonjechoi/selstagram-server:0.1
+    image: artify/selstagram-server:0.1
     container_name: django01
     ports:
       - "80:80"
