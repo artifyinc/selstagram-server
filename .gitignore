@@ -6,4 +6,7 @@ __pycache__
 env/
 logs/
 static/
+
 environment_variables
+.elasticbeanstalk/
+Dockerrun.aws.json
