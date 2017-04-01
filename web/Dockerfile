@@ -6,24 +6,23 @@ RUN apt-get upgrade -y
 RUN apt-get install -y nginx supervisor
 RUN pip install uwsgi
 
-
-# setup nginx
-RUN echo "daemon off;" >> /etc/nginx/nginx.conf
-RUN rm /etc/nginx/sites-enabled/default
-
-ADD nginx/selstagram-server /etc/nginx/sites-available/selstagram-server
-RUN ln -s /etc/nginx/sites-available/selstagram-server /etc/nginx/sites-enabled/
-ADD supervisor-selstagram.conf /etc/supervisor/conf.d/
-
-
 # install pip requirements
 ADD requirements.txt /home/docker/code/requirements.txt
 RUN pip install -r /home/docker/code/requirements.txt
 
-# copy source code
-ADD selstagram_server /home/docker/code/selstagram_server
-ADD selstagram.ini /home/docker/code/
 
+# setup nginx
+RUN echo "daemon off;" >> /etc/nginx/nginx.conf
+ADD nginx/selstagram-server /etc/nginx/sites-available/selstagram-server
+RUN ln -s /etc/nginx/sites-available/selstagram-server /etc/nginx/sites-enabled/
+RUN rm /etc/nginx/sites-enabled/default
+
+EXPOSE 80
+EXPOSE 443
+
+
+# setup django
+ADD selstagram_server /home/docker/code/selstagram_server
 WORKDIR /home/docker/code/selstagram_server
 
 ARG PYTHONUNBUFFERED
@@ -38,8 +37,12 @@ ARG SELSTA101_ITUNES_SHARED_SECRET
 
 RUN python manage.py collectstatic --no-input
 
-EXPOSE 80
-EXPOSE 443
 
+# setup uwsgi
+ADD uwsgi /home/docker/code/uwsgi
+
+
+# setup supervisor
+ADD supervisor/selstagram-server.conf /etc/supervisor/conf.d/
 RUN mkdir /home/docker/log
 CMD ["supervisord", "-n"]
