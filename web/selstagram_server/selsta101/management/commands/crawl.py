@@ -2,7 +2,11 @@
 # -*- coding: utf-8 -*-
 import datetime
 import logging
+import time
 
+from apscheduler.executors.pool import ThreadPoolExecutor
+from apscheduler.schedulers.background import BackgroundScheduler
+from dateutil.relativedelta import relativedelta
 from django.core.management import BaseCommand
 from instaLooter.core import InstaLooter
 from instaLooter.utils import get_times_from_cli, get_times
@@ -17,20 +21,17 @@ class Command(BaseCommand):
     # instagram hashtag crawler
     def add_arguments(self, parser):
         parser.add_argument('--tag', action='store', default='selfie', help='tag name to crawl')
-        parser.add_argument('--time', action='store', help='(2017-03-03:2017-03-03)')
+        parser.add_argument('--time', action='store', help='start:stop stop should be order than or equals to start. '
+                                                           'ex "2017-04-04:2017-04-01"')
         parser.add_argument('--credential', action='store', help='my_insta_id:my_password', required=True)
+        parser.add_argument('--interval', action='store', help='interval in hour', required=True)
         parser.add_argument('--count', action='store',
                             help='number of photos to crawl. IF NOT, all tagged photo are crawled')
 
     def handle(self, *args, **options):
-        tag = options['tag']
+        interval = int(options['interval'])
 
-        self.instagram_crawler = InstagramCrawler(directory=None,
-                                                  profile=None,
-                                                  hashtag=tag,
-                                                  add_metadata=False,
-                                                  get_videos=False,
-                                                  videos_only=False)
+        tag = options['tag']
 
         count = options.get('count', None)
         if count:
@@ -38,19 +39,44 @@ class Command(BaseCommand):
 
         credential = options['credential']
         username, password = credential.split(':')
-        self.instagram_crawler.login(username, password)
 
         time_string = options['time']
         if time_string is None:
-            yesterday_string = utils.BranchUtil.yesterday().isoformat()
-            time_string = ':'.join([yesterday_string, yesterday_string])
+            today_string = utils.BranchUtil.today().isoformat()
+            time_string = ':'.join([today_string, today_string])
 
         timeframe = get_times_from_cli(time_string)
 
+        self.executor = ThreadPoolExecutor(3)
+        self.scheduler = BackgroundScheduler(executors={'default': self.executor},
+                                             timezone=utils.BranchUtil.SEOUL_TIMEZONE)
+
+        self.scheduler.add_job(Command.crawl,
+                               args=[count, tag, timeframe, username, password],
+                               trigger='interval',
+                               next_run_time=(utils.BranchUtil.now() + relativedelta(seconds=5)),
+                               max_instances=3,
+                               hours=interval)
+
+        self.scheduler.start()
+
+        while True:
+            time.sleep(99999)
+
+    @classmethod
+    def crawl(cls, count, tag, timeframe, username, password):
+        logger.info('Start to crawl')
         tag_object, created = selsta101_models.Tag.objects.get_or_create(name=tag)
 
-        for media in self.instagram_crawler.medias(media_count=count,
-                                                   timeframe=timeframe):
+        instagram_crawler = InstagramCrawler(directory=None,
+                                             profile=None,
+                                             hashtag=tag_object.name,
+                                             add_metadata=False,
+                                             get_videos=False,
+                                             videos_only=False)
+        instagram_crawler.login(username, password)
+        for media in instagram_crawler.medias(media_count=count,
+                                              timeframe=timeframe):
             # FIXME
             # insert_bulk
             # update_bulk
@@ -77,8 +103,10 @@ class Command(BaseCommand):
                 instagram_media.like_count = media['likes']['count']
                 instagram_media.save()
 
-            logger.info(instagram_media.id, instagram_media.code, instagram_media.source_url, instagram_media.caption[0:20])
+            logger.info(' '.join(str(item) for item in [instagram_media.id, instagram_media.code, instagram_media.source_url,
+                        instagram_media.caption]))
 
+        logger.info('Finish to crawl')
 
 class InstagramCrawler(InstaLooter):
     def __init__(self, **kwargs):

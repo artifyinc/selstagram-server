@@ -18,3 +18,22 @@ DATABASES = {
 DEBUG = False
 
 ALLOWED_HOSTS = ['*']
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'file': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(BASE_DIR, 'logs/') + 'crawl.log',
+        },
+    },
+    'loggers': {
+        'selsta101.management.commands.crawl': {
+            'handlers': ['file'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+    },
+}
