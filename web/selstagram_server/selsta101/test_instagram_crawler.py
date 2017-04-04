@@ -1,6 +1,5 @@
 from django.test import TestCase
 
-from selstagram_server import utils
 from .management.commands.crawl import InstagramCrawler
 
 
@@ -35,3 +34,14 @@ class InstagramCrawlerTest(TestCase):
         #
         # # Then : number of photos crawled is 40
         # self.assertEqual(count, number_of_media)
+
+    # def test_crawl_commad(self):
+        # FIXME
+        # After edit username, password value above,
+        # remove # mark for code below and comment out code above assertion
+        # call_command("crawl",
+        #              "--credential=your_account:your_password",
+        #              "--tag=셀스타그램",
+        #              #--time=start:stop   stop is older than tsrt
+        #              "--time=2017-04-04:2017-04-01",
+        #              "--count=50")
