@@ -23,7 +23,7 @@ class Command(BaseCommand):
         parser.add_argument('--tag', action='store', default='selfie', help='tag name to crawl')
         parser.add_argument('--time', action='store', help='start:stop stop should be order than or equals to start. '
                                                            'ex "2017-04-04:2017-04-01"')
-        parser.add_argument('--credential', action='store', help='my_insta_id:my_password', required=True)
+        parser.add_argument('--credential', action='store', help='my_insta_id:my_password')
         parser.add_argument('--interval', action='store', help='interval in hour', required=True)
         parser.add_argument('--count', action='store',
                             help='number of photos to crawl. IF NOT, all tagged photo are crawled')
@@ -37,8 +37,7 @@ class Command(BaseCommand):
         if count:
             count = int(count)
 
-        credential = options['credential']
-        username, password = credential.split(':')
+        credential = options.get('credential', None)
 
         time_string = options['time']
         if time_string is None:
@@ -52,7 +51,7 @@ class Command(BaseCommand):
                                              timezone=utils.BranchUtil.SEOUL_TIMEZONE)
 
         self.scheduler.add_job(Command.crawl,
-                               args=[count, tag, timeframe, username, password],
+                               args=[count, tag, timeframe, credential],
                                trigger='interval',
                                next_run_time=(utils.BranchUtil.now() + relativedelta(seconds=5)),
                                max_instances=3,
@@ -64,7 +63,7 @@ class Command(BaseCommand):
             time.sleep(99999)
 
     @classmethod
-    def crawl(cls, count, tag, timeframe, username, password):
+    def crawl(cls, count, tag, timeframe, credential=None):
         logger.info('Start to crawl')
         tag_object, created = selsta101_models.Tag.objects.get_or_create(name=tag)
 
@@ -74,7 +73,11 @@ class Command(BaseCommand):
                                              add_metadata=False,
                                              get_videos=False,
                                              videos_only=False)
-        instagram_crawler.login(username, password)
+
+        if credential:
+            username, password = credential.split(':')
+            instagram_crawler.login(username, password)
+
         for media in instagram_crawler.medias(media_count=count,
                                               timeframe=timeframe):
             # FIXME
