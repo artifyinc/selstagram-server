@@ -1,8 +1,8 @@
 version: '2'
 services:
-  rabbitmq:
-    image: rabbitmq:3-management
-    container_name: rabbitmq
+#  rabbitmq:
+#    image: rabbitmq:3-management
+#    container_name: rabbitmq
 
   django_nginx:
     env_file:
@@ -11,5 +11,5 @@ services:
     container_name: django01
     ports:
       - "80:80"
-    links:
-      - rabbitmq
+#    links:
+#      - rabbitmq
