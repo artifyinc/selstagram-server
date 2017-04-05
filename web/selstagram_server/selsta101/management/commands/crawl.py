@@ -64,7 +64,7 @@ class Command(BaseCommand):
 
     @classmethod
     def crawl(cls, count, tag, timeframe, credential=None):
-        logger.info('Start to crawl')
+        print("Start to crawl")
         tag_object, created = selsta101_models.Tag.objects.get_or_create(name=tag)
 
         instagram_crawler = InstagramCrawler(directory=None,
@@ -106,10 +106,11 @@ class Command(BaseCommand):
                 instagram_media.like_count = media['likes']['count']
                 instagram_media.save()
 
-            logger.info(' '.join(str(item) for item in [instagram_media.id, instagram_media.code, instagram_media.source_url,
-                        instagram_media.caption]))
+            print(' '.join(str(item) for item in [instagram_media.id, instagram_media.code, instagram_media.source_url,
+                                                  instagram_media.caption]))
 
-        logger.info('Finish to crawl')
+            print("crawling finished")
+
 
 class InstagramCrawler(InstaLooter):
     def __init__(self, **kwargs):
@@ -146,7 +147,7 @@ class InstagramCrawler(InstaLooter):
                 yield media
 
                 count += 1
-                if count >= media_count:
+                if media_count and count >= media_count:
                     return
 
     def _timed_medias(self, media_count=None, with_pbar=False, timeframe=None):
@@ -166,5 +167,5 @@ class InstagramCrawler(InstaLooter):
                 elif media_date < end_time:
                     return
 
-                if count >= media_count:
+                if media_count and count >= media_count:
                     return
