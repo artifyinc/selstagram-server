@@ -1,9 +1,5 @@
-version: '2'
+version: '3'
 services:
-  rabbitmq:
-    image: rabbitmq:3-management
-    container_name: rabbitmq
-
   django_nginx:
     env_file:
       - web/environment_variables
@@ -11,5 +7,6 @@ services:
     container_name: django01
     ports:
       - "80:80"
-    links:
-      - rabbitmq
+    external_links:
+      - postgres
+
