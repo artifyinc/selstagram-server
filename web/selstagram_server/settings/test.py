@@ -20,11 +20,6 @@ LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
     'handlers': {
-        'file': {
-            'level': 'DEBUG',
-            'class': 'logging.FileHandler',
-            'filename': os.path.join(BASE_DIR, 'logs/') + 'crawl.log',
-        },
         'console': {
             'class': 'logging.StreamHandler',
         },
@@ -32,7 +27,7 @@ LOGGING = {
 
     'loggers': {
         'selsta101.management.commands.crawl': {
-            'handlers': ['file', 'console'],
+            'handlers': ['console'],
             'level': 'DEBUG',
             'propagate': True,
         },
