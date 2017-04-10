@@ -39,4 +39,8 @@ class Migration(migrations.Migration):
             name='source_id',
             field=models.BigIntegerField(),
         ),
+        migrations.AlterUniqueTogether(
+            name='dailyrank',
+            unique_together=set([('date', 'rank'), ('date', 'media')]),
+        ),
     ]

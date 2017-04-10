@@ -67,3 +67,6 @@ class DailyRank(StringHelperModelMixin, TimeStampedModel):
     date = models.DateField(db_index=True)
     rank = models.SmallIntegerField()
     media = models.ForeignKey(InstagramMedia, on_delete=models.PROTECT)
+
+    class Meta:
+        unique_together=(('date', 'rank'), ('date', 'media'))
