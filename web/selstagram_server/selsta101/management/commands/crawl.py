@@ -55,7 +55,7 @@ class Command(BaseCommand):
                                trigger='interval',
                                next_run_time=(utils.BranchUtil.now() + relativedelta(seconds=5)),
                                max_instances=3,
-                               hours=interval)
+                               minutes=interval)
 
         self.scheduler.start()
 
