@@ -40,18 +40,18 @@ class Tag(StringHelperModelMixin, TimeStampedModel):
 class InstagramMedia(StringHelperModelMixin, TimeStampedModel):
     id = models.AutoField(primary_key=True)
     tag = models.ForeignKey(Tag, on_delete=models.PROTECT)
-    source_id = models.BigIntegerField(db_index=True)
+    source_id = models.BigIntegerField()
     source_url = models.URLField(max_length=256)
     source_date = models.DateTimeField(default=utils.BranchUtil.now)
 
     # slug
-    code = models.CharField(max_length=64)
+    code = models.CharField(max_length=64, unique=True, db_index=True)
     width = models.PositiveSmallIntegerField()
     height = models.PositiveSmallIntegerField()
 
     thumbnail_url = models.URLField(max_length=256)
 
-    owner_id = models.BigIntegerField()
+    owner_id = models.BigIntegerField(db_index=True)
 
     caption = models.TextField()
     comment_count = models.PositiveIntegerField()
@@ -67,3 +67,6 @@ class DailyRank(StringHelperModelMixin, TimeStampedModel):
     date = models.DateField(db_index=True)
     rank = models.SmallIntegerField()
     media = models.ForeignKey(InstagramMedia, on_delete=models.PROTECT)
+
+    class Meta:
+        unique_together=(('date', 'rank'), ('date', 'media'))
