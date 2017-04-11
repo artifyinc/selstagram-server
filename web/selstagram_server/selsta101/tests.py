@@ -7,6 +7,7 @@ from rest_framework.test import APITestCase
 
 from selsta101.views import InstagramMediaPageNation
 from selstagram_server import utils, test_mixins
+from . import factories as selsta101_factories
 from . import models as selsta101_models
 
 
@@ -160,6 +161,7 @@ class TagMediaViewTests(test_mixins.InstagramMediaMixin, APITestCase):
     def test_media_popular(self):
         # Given : Create 1000 dummy InstagramMedia
         size = 1000
+        selsta101_factories.InstagramMediaFactory.reset_sequence(0)
         self.create_instagram_media(size)
 
         limit = 101
@@ -178,6 +180,7 @@ class TagMediaViewTests(test_mixins.InstagramMediaMixin, APITestCase):
         # Given : from today to 6 days ago for a week,
         #         create 101 InstagramMedia for a each day.
         #         Rank those by votes. all votes are zero
+        selsta101_factories.InstagramMediaFactory.reset_sequence(0)
         self.create_ranks()
 
         # When : Invoking media rank api
@@ -190,6 +193,9 @@ class TagMediaViewTests(test_mixins.InstagramMediaMixin, APITestCase):
         for item in response.data:
             daily_rank = Munch(item)
             self.assertEqual(101, len(daily_rank.rank))
+            print(daily_rank)
+
+        self.fail()
 
     def test_vote_api(self):
         # Given : Create 1 dummy InstagramMedia
