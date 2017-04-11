@@ -157,6 +157,23 @@ class TagMediaViewTests(test_mixins.InstagramMediaMixin, APITestCase):
         media_ = Munch(response.data)
         self.assertEqual(len(media_.results), limit)
 
+    def test_media_popular(self):
+        # Given : Create 1000 dummy InstagramMedia
+        size = 1000
+        self.create_instagram_media(size)
+
+        limit = 101
+        response = self.client.get('/tags/셀스타그램/media/popular/'
+                                   '?limit={limit}'.format(limit=limit))
+
+        # Then : 100 media elements of which ids are [38, 137] must be received
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        response_ = Munch(response.data)
+        self.assertEqual(len(response_.results), limit)
+
+        media_array = response_.results
+        self.assertEqual(media_array[0]['like_count'], size - 1)
+
     def test_media_rank(self):
         # Given : from today to 6 days ago for a week,
         #         create 101 InstagramMedia for a each day.

@@ -39,8 +39,9 @@ class InstagramMediaFactory(factory.DjangoModelFactory):
     owner_id = 247272838
 
     caption = u'\u2600\ufe0f'
-    comment_count = 47
-    like_count = 2785
+    comment_count = factory.Sequence(lambda n: n)
+    like_count = factory.Sequence(lambda n: n)
+    votes = factory.Sequence(lambda n: n)
 
     class Meta:
         model = InstagramMedia

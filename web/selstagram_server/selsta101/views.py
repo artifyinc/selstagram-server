@@ -51,8 +51,24 @@ class InstagramMediaViewSet(viewsets.ModelViewSet):
         return self.list(request, *args, **kwargs)
 
     @list_route()
-    def popular(self, request, *args, **kwargs):
-        return self.list(request, *args, **kwargs)
+    def popular(self, request, tag_name=None,  *args, **kwargs):
+        queryset = self.get_queryset()
+
+        if tag_name:
+            queryset = queryset.filter(tag__name=tag_name)
+
+        # FIXME
+        # 1. Use votes later, instead of like_count
+        # 2. Use Rank table insteade of order_by
+        queryset = queryset.order_by('-like_count')
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
 
     @list_route()
     def rank(self, request, *args, **kwargs):
