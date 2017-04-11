@@ -87,19 +87,18 @@ class Command(BaseCommand):
             source_date = datetime.datetime.fromtimestamp(media['date'],
                                                           tz=utils.BranchUtil.SEOUL_TIMEZONE)
             instagram_media, created = selsta101_models. \
-                InstagramMedia.objects.get_or_create(tag=tag_object,
-                                                     source_id=media['id'],
-                                                     source_url=media['display_src'],
-                                                     source_date=source_date,
-                                                     code=media['code'],
-                                                     width=media['dimensions']['width'],
-                                                     height=media['dimensions']['height'],
-                                                     thumbnail_url=media['thumbnail_src'],
-                                                     owner_id=media['owner']['id'],
-                                                     caption=media.get('caption', ''),
-                                                     comment_count=media['comments']['count'],
-                                                     like_count=media['likes']['count'],
-                                                     )
+                InstagramMedia.objects.get_or_create(code=media['code'],
+                                                     defaults={'tag_id': tag_object.id,
+                                                               'source_id': media['id'],
+                                                               'source_url': media['display_src'],
+                                                               'source_date': source_date,
+                                                               'width': media['dimensions']['width'],
+                                                               'height': media['dimensions']['height'],
+                                                               'thumbnail_url': media['thumbnail_src'],
+                                                               'owner_id': media['owner']['id'],
+                                                               'caption': media.get('caption', ''),
+                                                               'comment_count': media['comments']['count'],
+                                                               'like_count': media['likes']['count']})
 
             if not created:
                 instagram_media.comment_count = media['comments']['count']
