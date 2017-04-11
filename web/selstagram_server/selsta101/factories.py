@@ -31,7 +31,7 @@ class InstagramMediaFactory(factory.DjangoModelFactory):
     source_date = factory.LazyFunction(lambda: utils.BranchUtil.date_to_datetime(
         utils.BranchUtil.today()))
 
-    code = 'BR4Yc-KlR37'
+    code = factory.Sequence(lambda n:'BR4Yc-KlR37' + str(n))
     width = 1349
     height = 1080
 

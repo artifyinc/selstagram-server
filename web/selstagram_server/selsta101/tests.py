@@ -193,9 +193,6 @@ class TagMediaViewTests(test_mixins.InstagramMediaMixin, APITestCase):
         for item in response.data:
             daily_rank = Munch(item)
             self.assertEqual(101, len(daily_rank.rank))
-            print(daily_rank)
-
-        self.fail()
 
     def test_vote_api(self):
         # Given : Create 1 dummy InstagramMedia
