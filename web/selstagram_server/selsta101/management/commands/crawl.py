@@ -24,7 +24,7 @@ class Command(BaseCommand):
         parser.add_argument('--time', action='store', help='start:stop stop should be order than or equals to start. '
                                                            'ex "2017-04-04:2017-04-01"')
         parser.add_argument('--credential', action='store', help='my_insta_id:my_password')
-        parser.add_argument('--interval', action='store', help='interval in hour', required=True)
+        parser.add_argument('--interval', action='store', help='interval in minutes', required=True)
         parser.add_argument('--count', action='store',
                             help='number of photos to crawl. IF NOT, all tagged photo are crawled')
 
@@ -62,9 +62,13 @@ class Command(BaseCommand):
         while True:
             time.sleep(99999)
 
+    RUN_COUNT = 0
+
     @classmethod
     def crawl(cls, count, tag, timeframe, credential=None):
-        print("Start to crawl")
+        print("[{time}][{crawl_count}] Start to crawl."
+              .format(time=utils.BranchUtil.now(), crawl_count=Command.RUN_COUNT))
+
         tag_object, created = selsta101_models.Tag.objects.get_or_create(name=tag)
 
         instagram_crawler = InstagramCrawler(directory=None,
@@ -108,7 +112,9 @@ class Command(BaseCommand):
             print(' '.join(str(item) for item in [instagram_media.id, instagram_media.code, instagram_media.source_url,
                                                   instagram_media.caption]))
 
-            print("crawling finished")
+        print("[{time}][{crawl_count}] Crawling finished."
+              .format(time=utils.BranchUtil.now(), crawl_count=Command.RUN_COUNT))
+        Command.RUN_COUNT += 1
 
 
 class InstagramCrawler(InstaLooter):

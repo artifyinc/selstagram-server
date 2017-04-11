@@ -20,7 +20,6 @@ class DummyClass(object):
         print("End dummy_job")
 
 
-
 class InstagramCrawlerTest(TestCase):
     def test_instagram_crawler(self):
         # Given : login to Instagram as username 'your_username'
@@ -62,11 +61,11 @@ class InstagramCrawlerTest(TestCase):
     #                  # "--credential=your_account:your_password",
     #                  "--tag=셀스타그램",
     #                  # --time=start:stop
-    #                  # stop is older than tsrt
+    #                  # stop is older than start
     #                  # "--time=2017-04-04:2017-04-01",
     #                  "--count=24")
 
-    # testing apscheduler usage
+    ## testing apscheduler usage
     # def test_apscheduler(self):
     #     executor = ThreadPoolExecutor(10)
     #     scheduler = BackgroundScheduler(executors={'default': executor},
