@@ -50,8 +50,7 @@ class Command(BaseCommand):
     @classmethod
     def rank(cls, tag, date=None):
 
-        print("[{time}][{crawl_count}] Running Rank command."
-              .format(time=utils.BranchUtil.now(), crawl_count=Command.RUN_COUNT))
+        print("[{time}] Running Rank command.".format(time=utils.BranchUtil.now()))
         tag_object, created = selsta101_models.Tag.objects.get_or_create(name=tag)
 
         if created:
@@ -71,6 +70,7 @@ class Command(BaseCommand):
 
             this_time = last_rank.turn + 1
 
+        print("[turn={}]".format(turn=Command.RUN_COUNT))
         rank_df = cls.get_daily_rank(date)
 
         with transaction.atomic():
