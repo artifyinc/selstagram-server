@@ -43,6 +43,6 @@ ADD uwsgi /home/docker/code/uwsgi
 
 
 # setup supervisor
-ADD supervisor/selstagram-server.conf /etc/supervisor/conf.d/
+ADD supervisor/selstagram-worker.conf /etc/supervisor/conf.d/
 RUN mkdir /home/docker/log
 CMD ["supervisord", "-n"]
