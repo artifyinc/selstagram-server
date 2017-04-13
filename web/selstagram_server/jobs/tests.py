@@ -27,8 +27,6 @@ class CrawlJobTest(APITestCase):
         response = self.client.post('/jobs/crawl/', data={'limit_count': count, 'tag': '셀스타그램'})
 
         # Then:
-        print(response.data)
-
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         number_of_media_after_crawl = selsta101_models.InstagramMedia.objects.count()
 
