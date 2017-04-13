@@ -33,5 +33,3 @@ class CrawlJobTest(APITestCase):
         number_of_media_after_crawl = selsta101_models.InstagramMedia.objects.count()
 
         self.assertEqual(number_of_media_after_crawl, number_of_media_before_crawl + count)
-
-        self.fail()
