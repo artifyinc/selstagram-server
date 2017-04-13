@@ -70,7 +70,7 @@ class Command(BaseCommand):
 
             this_time = last_rank.turn + 1
 
-        print("[turn={}]".format(turn=Command.RUN_COUNT))
+        print("[turn={turn}]".format(turn=Command.RUN_COUNT))
         rank_df = cls.get_daily_rank(date)
 
         with transaction.atomic():
