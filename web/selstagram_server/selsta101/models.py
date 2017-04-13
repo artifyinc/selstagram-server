@@ -1,29 +1,9 @@
 from django.db import models
-
 from selstagram_server import utils
 
 
 # Create your models here.
-
-
-class StringHelperModelMixin(object):
-    def __str__(self):
-        return str(self.id)
-
-    def field_list_to_string(self, field_list=[]):
-        return_string = str(self.id) + ': '
-        for string in field_list:
-            return_string += str(string) + ', '
-
-        return return_string[:-2]
-
-
-class TimeStampedModel(models.Model):
-    created = models.DateTimeField(auto_now_add=True)
-    modified = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        abstract = True
+from selstagram_server.model_mixins import StringHelperModelMixin, TimeStampedModel
 
 
 class Tag(StringHelperModelMixin, TimeStampedModel):

@@ -20,13 +20,18 @@ from rest_framework_nested import routers as drf_nested_routers
 from rest_framework import routers as drf_routers
 
 from selsta101 import views as selsta101_views
+from jobs import views as jobs_views
 
 router = drf_nested_routers.DefaultRouter()
 router.register('tags', selsta101_views.TagViewSet)
 router.register('media', selsta101_views.InstagramMediaViewSet, base_name='media')
+router.register('jobs/crawl', jobs_views.CrawlJobViewSet)
 
 tags_router = drf_nested_routers.NestedSimpleRouter(router, 'tags', lookup='tag')
 tags_router.register('media', selsta101_views.InstagramMediaViewSet, base_name='media')
+
+
+
 
 urlpatterns = [
     url(r'^verify_receipt', selsta101_views.verify_receipt),
