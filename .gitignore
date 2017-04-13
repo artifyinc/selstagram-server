@@ -9,4 +9,4 @@ static/
 
 environment_variables
 .elasticbeanstalk/
-Dockerrun.aws.json
+*.aws.json
